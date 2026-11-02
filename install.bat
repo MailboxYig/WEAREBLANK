@@ -1,5 +1,4 @@
 @echo off
-setlocal enabledelayedexpansion
 TITLE WEAREBLANK - CODM Auto-Updater PC Installer
 COLOR 0A
 echo ====================================================================
@@ -10,29 +9,36 @@ echo.
 set "PC_TOOLS_DIR=C:\WEAREBLANK_ADB"
 set "ADB_PATH=%PC_TOOLS_DIR%\platform-tools\adb.exe"
 
-:: 1. Setup ADB on PC Hard Drive
+:: 1. Check for system ADB
 where adb >nul 2>&1
-if !errorlevel! equ 0 (
+if %errorlevel% equ 0 (
     set "ADB_PATH=adb"
     echo [+] Using system-wide ADB found on PC.
-) else if exist "%ADB_PATH%" (
-    echo [+] Using existing WEAREBLANK ADB toolkit.
-) else (
-    echo [!] ADB not found. Installing portable ADB to PC (%PC_TOOLS_DIR%)...
-    if not exist "%PC_TOOLS_DIR%" mkdir "%PC_TOOLS_DIR%"
-    powershell -Command "Invoke-WebRequest -Uri 'https://dl.google.com/android/repository/platform-tools-latest-windows.zip' -OutFile '%PC_TOOLS_DIR%\tools.zip'"
-    powershell -Command "Expand-Archive -Path '%PC_TOOLS_DIR%\tools.zip' -DestinationPath '%PC_TOOLS_DIR%' -Force"
-    del "%PC_TOOLS_DIR%\tools.zip"
-    echo [+] ADB installed successfully!
+    goto :CHECK_APKS
 )
 
-:: 2. Auto-download Termux directly from F-Droid and save as termux.apk
+:: 2. Check for local hard drive ADB
+if exist "%ADB_PATH%" (
+    echo [+] Using existing WEAREBLANK ADB toolkit.
+    goto :CHECK_APKS
+)
+
+:: 3. Download ADB if missing
+echo [!] ADB not found. Installing portable ADB to PC (%PC_TOOLS_DIR%)...
+if not exist "%PC_TOOLS_DIR%" mkdir "%PC_TOOLS_DIR%"
+powershell -Command "Invoke-WebRequest -Uri 'https://dl.google.com/android/repository/platform-tools-latest-windows.zip' -OutFile '%PC_TOOLS_DIR%\tools.zip'"
+powershell -Command "Expand-Archive -Path '%PC_TOOLS_DIR%\tools.zip' -DestinationPath '%PC_TOOLS_DIR%' -Force"
+del "%PC_TOOLS_DIR%\tools.zip"
+echo [+] ADB installed successfully!
+
+:CHECK_APKS
+:: 4. Auto-download Termux from F-Droid if missing
 if not exist "termux.apk" (
     echo [+] Downloading Termux from F-Droid...
     powershell -Command "Invoke-WebRequest -Uri 'https://f-droid.org/repo/com.termux_1002.apk' -OutFile 'termux.apk'"
 )
 
-:: 3. Auto-download Termux:Boot from F-Droid if missing
+:: 5. Auto-download Termux:Boot if missing
 if not exist "termux-boot.apk" (
     echo [+] Downloading Termux:Boot from F-Droid...
     powershell -Command "Invoke-WebRequest -Uri 'https://f-droid.org/repo/com.termux.boot_7.apk' -OutFile 'termux-boot.apk'"
