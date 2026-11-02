@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 TITLE WEAREBLANK - CODM Auto-Updater PC Installer
 COLOR 0A
 echo ====================================================================
@@ -6,13 +7,12 @@ echo   WEAREBLANK CODM Auto-Updater - PC Hard Drive Setup
 echo ====================================================================
 echo.
 
-:: Define persistent PC hard drive directory for tools
 set "PC_TOOLS_DIR=C:\WEAREBLANK_ADB"
 set "ADB_PATH=%PC_TOOLS_DIR%\platform-tools\adb.exe"
 
 :: 1. Setup ADB on PC Hard Drive
 where adb >nul 2>&1
-if %errorlevel% equ 0 (
+if !errorlevel! equ 0 (
     set "ADB_PATH=adb"
     echo [+] Using system-wide ADB found on PC.
 ) else if exist "%ADB_PATH%" (
@@ -32,7 +32,7 @@ if not exist "termux.apk" (
     powershell -Command "Invoke-WebRequest -Uri 'https://f-droid.org/repo/com.termux_1002.apk' -OutFile 'termux.apk'"
 )
 
-:: Auto-download Termux:Boot from F-Droid if missing
+:: 3. Auto-download Termux:Boot from F-Droid if missing
 if not exist "termux-boot.apk" (
     echo [+] Downloading Termux:Boot from F-Droid...
     powershell -Command "Invoke-WebRequest -Uri 'https://f-droid.org/repo/com.termux.boot_7.apk' -OutFile 'termux-boot.apk'"
