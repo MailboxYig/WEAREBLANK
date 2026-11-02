@@ -70,8 +70,9 @@ echo ====================================================================
 echo   SETUP ALMOST COMPLETE! 
 echo   Put on your Quest headset now. Termux should be open.
 echo.
-echo   Type this ONE command inside Termux and press Enter:
+echo   Type these TWO commands inside Termux in order and press Enter:
 echo   ----------------------------------------------------------------
+echo   termux-setup-storage
 echo   sh /sdcard/Download/setup.sh
 echo   ----------------------------------------------------------------
 echo   *(Accept the Android storage permission popup when it appears)*
